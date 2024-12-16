@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <header class="bg-success text-white text-center py-4 mb-3">
+        <h1 class="h3">Admin Dashboard</h1>
+        <p>Welcome, {{ admin.nama_admin }}!</p>
+    </header>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#crud-data" onclick="activateSection(event, 'crud-data')">Data Stasiun</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#assign-sepeda" onclick="activateSection(event, 'assign-sepeda')">Data Sepeda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pemeliharaan" onclick="activateSection(event, 'pemeliharaan')">Data Pemeliharaan</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Feedback Messages -->
+        {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+            <p class="mb-0">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div id="crud-data" class="d-none">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Stasiun</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Stasiun</th>
+                                    <th>Nama Stasiun</th>
+                                    <th>Alamat</th>
+                                    <th>Sepeda Tersedia</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stasiun in stasiun_list %}
+                                <tr>
+                                    <td>{{ stasiun.id_stasiun }}</td>
+                                    <td>{{ stasiun.nama_stasiun }}</td>
+                                    <td>{{ stasiun.alamat_stasiun }}</td>
+                                    <td>
+                                        <ul class="list-unstyled">
+                                            {% for sepeda in stasiun.sepeda.all %}
+                                            <li>{{ sepeda.tipe_sepeda }} - {{ sepeda.merk_sepeda }} ({{ sepeda.status_sepeda }})</li>
+                                            {% empty %}
+                                            <li>Belum ada sepeda yang di-assign</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <a href="?edit_stasiun={{ stasiun.id_stasiun }}" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="?delete_stasiun={{ stasiun.id_stasiun }}" class="btn btn-sm btn-danger">Hapus</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <h5>Tambah atau Perbarui Stasiun</h5>
+                        {{ stasiun_form.as_p }}
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="assign-sepeda" class="d-none">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Data Sepeda</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ sepeda_form.as_p }}
+                        <button type="submit" class="btn btn-primary">Simpan Sepeda</button>
+                    </form>
+
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipe</th>
+                                    <th>Merk</th>
+                                    <th>Harga Sewa</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sepeda in sepeda_list %}
+                                <tr>
+                                    <td>{{ sepeda.id_sepeda }}</td>
+                                    <td>{{ sepeda.tipe_sepeda }}</td>
+                                    <td>{{ sepeda.merk_sepeda }}</td>
+                                    <td>{{ sepeda.harga_sewa }}</td>
+                                    <td>{{ sepeda.status_sepeda }}</td>
+                                    <td>
+                                        <a href="?edit_sepeda={{ sepeda.id_sepeda }}" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="?delete_sepeda={{ sepeda.id_sepeda }}" class="btn btn-sm btn-danger">Hapus</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pemeliharaan" class="d-none">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Data Pemeliharaan</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ pemeliharaan_form.as_p }}
+                        <button type="submit" class="btn btn-primary">Simpan Pemeliharaan</button>
+                    </form>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sepeda</th>
+                                    <th>Admin</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pemeliharaan in pemeliharaan_list %}
+                                <tr>
+                                    <td>{{ pemeliharaan.sepeda }}</td>
+                                    <td>{{ pemeliharaan.admin }}</td>
+                                    <td>{{ pemeliharaan.status_pemeliharaan }}</td>
+                                    <td>{{ pemeliharaan.tanggal_pemeliharaan }}</td>
+                                    <td>
+                                        <a href="?edit_pemeliharaan={{ pemeliharaan.id }}" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="?delete_pemeliharaan={{ pemeliharaan.id }}" class="btn btn-sm btn-danger">Hapus</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function activateSection(event, sectionId) {
+            event.preventDefault();
+
+            const sections = document.querySelectorAll('main > div');
+            sections.forEach(section => section.classList.add('d-none'));
+
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('d-none');
+            }
+
+            const links = document.querySelectorAll('nav a');
+            links.forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

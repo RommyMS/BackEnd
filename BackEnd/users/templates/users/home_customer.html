@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Customer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white text-center">
+                        <h1 class="h4">Welcome, {{ customer.nama_customer }}!</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5>Customer Details</h5>
+                            <p><strong>Alamat:</strong> {{ customer.alamat_customer }}</p>
+                            <p><strong>Telepon:</strong> {{ customer.telepon_customer }}</p>
+                        </div>
+
+                        <!-- Pesan Sukses atau Error -->
+                        {% if messages %}
+                            <div class="alert alert-success" role="alert">
+                                {% for message in messages %}
+                                    <p class="mb-0">{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Daftar sepeda yang tersedia -->
+                        <div class="table-responsive">
+                            <h5>Daftar Sepeda yang Tersedia</h5>
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>Tipe Sepeda</th>
+                                        <th>Merk Sepeda</th>
+                                        <th>Harga Sewa (per jam)</th>
+                                        <th>Stasiun</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sepeda in sepeda_tersedia %}
+                                        <tr>
+                                            <td>{{ sepeda.tipe_sepeda }}</td>
+                                            <td>{{ sepeda.merk_sepeda }}</td>
+                                            <td>Rp {{ sepeda.harga_sewa }}</td>
+                                            <td>{{ sepeda.stasiun.nama_stasiun }}</td>
+                                            <td>
+                                                <a href="{% url 'pilih_sepeda' sepeda.id_sepeda %}" class="btn btn-success btn-sm">Pinjam Sepeda</a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">Tidak ada sepeda yang tersedia.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Button Logout -->
+                        <div class="text-center mt-4">
+                            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
